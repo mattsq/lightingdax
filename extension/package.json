@@ -1,0 +1,105 @@
+{
+  "name": "lightingdax",
+  "displayName": "Lightning DAX Workbench",
+  "description": "Edit PBIP measures and query the real engine with explicit result provenance.",
+  "version": "0.1.0",
+  "publisher": "lightingdax",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:dax"
+  ],
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "dax",
+        "aliases": [
+          "DAX"
+        ],
+        "extensions": [
+          ".dax"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "lightingdax.openMeasure",
+        "title": "DAX: Open Model Measure"
+      },
+      {
+        "command": "lightingdax.saveMeasure",
+        "title": "DAX: Save Measure to TMDL"
+      },
+      {
+        "command": "lightingdax.evaluate",
+        "title": "DAX: Evaluate Expression or Query"
+      },
+      {
+        "command": "lightingdax.preview",
+        "title": "DAX: Preview Report Visual"
+      },
+      {
+        "command": "lightingdax.restart",
+        "title": "DAX: Reload Project and Connection"
+      }
+    ],
+    "configuration": {
+      "title": "Lightning DAX",
+      "properties": {
+        "lightingdax.serverPath": {
+          "type": "string",
+          "default": "lightingdax",
+          "description": "Rust executable path."
+        },
+        "lightingdax.projectPath": {
+          "type": "string",
+          "default": "",
+          "description": "PBIP project folder. Empty uses the first workspace folder."
+        },
+        "lightingdax.adapterProgram": {
+          "type": "string",
+          "default": "",
+          "description": "Optional adapter executable, e.g. dotnet. Connection string belongs in the inherited LIGHTINGDAX_CONNECTION environment variable."
+        },
+        "lightingdax.adapterArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Adapter arguments, e.g. the published adapter DLL path."
+        },
+        "lightingdax.liveEvaluation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Evaluate edited DAX after a 300 ms pause."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p . && esbuild src/extension.ts --bundle --platform=node --external:vscode --outfile=dist/extension.js && node scripts/copy-vendor.cjs",
+    "test": "npm run build && node --test test/*.test.cjs",
+    "package": "vsce package --allow-missing-repository"
+  },
+  "dependencies": {
+    "vega": "^5.30.0",
+    "vega-embed": "^6.26.0",
+    "vega-lite": "^5.20.1",
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.7.3"
+  }
+}

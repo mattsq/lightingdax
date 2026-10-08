@@ -1,0 +1,28 @@
+table Sales
+	column Amount
+		dataType: double
+		sourceColumn: Amount
+
+	column Quantity
+		dataType: int64
+		sourceColumn: Quantity
+
+	column Category
+		dataType: string
+		sourceColumn: Category
+
+	measure Revenue = SUM(Sales[Amount])
+		formatString: #,0.00
+		lineageTag: 125ad1a2-63c8-4bd9-9811-f146bc06ea41
+
+	measure Units = SUM(Sales[Quantity])
+
+	measure 'Revenue per Unit' = DIVIDE([Revenue], [Units])
+
+	partition Sales = m
+		mode: import
+		source =
+			let
+				Source = #table(type table [Amount=number, Quantity=Int64.Type, Category=text], {{20.0, 2, "A"}, {30.0, 3, "B"}})
+			in
+				Source

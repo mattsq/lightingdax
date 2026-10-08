@@ -1,0 +1,6 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {visualQuery}=require('../dist/preview');
+const field=(type,table,property)=>({field:{[type]:{Expression:{SourceRef:{Entity:table}},Property:property}}});
+test('PBIR measure and category become one grouped query',()=>{const v={visual:{visualType:'clusteredColumnChart',query:{queryState:{Category:{projections:[field('Column','Sales','Category')]},Y:{projections:[field('Measure','Sales','Revenue')]}}}}};assert.deepEqual(visualQuery(v),{kind:'bar',query:`EVALUATE SUMMARIZECOLUMNS('Sales'[Category], "Revenue", 'Sales'[Revenue])`});});
+test('card query escapes DAX identifiers',()=>{const v={visual:{visualType:'card',query:{queryState:{Values:{projections:[field('Measure',"Owner's",'A]B"C')]}}}}};assert.equal(visualQuery(v).query,`EVALUATE ROW("A]B""C", 'Owner''s'[A]]B"C])`);});
+test('custom visuals and visual filters fail explicitly',()=>{assert.throws(()=>visualQuery({visual:{visualType:'custom'}}));assert.throws(()=>visualQuery({filterConfig:{},visual:{visualType:'card',query:{queryState:{}}}}));});
+test('implicit aggregates and unsupported projections fail explicitly',()=>{assert.throws(()=>visualQuery({visual:{visualType:'card',query:{queryState:{Values:{projections:[{field:{Aggregation:{}}}]}}}}}));});
